@@ -22,6 +22,12 @@ public class EndFrame extends javax.swing.JFrame {
     /**
      * Creates new form EndFrame
      */
+    public EndFrame() {
+        score = 100;
+        getContentPane().setBackground(Color.white);
+        initComponents();
+        jLabel2.setText(jLabel2.getText() + score);
+    }
     public EndFrame(int p) {
         score = p;
         getContentPane().setBackground(Color.white);

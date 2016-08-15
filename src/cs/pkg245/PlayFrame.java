@@ -86,10 +86,7 @@ public class PlayFrame  extends javax.swing.JFrame  implements MouseListener{
         if(gameState == 4)
             jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cs/pkg245/oneleg.png")));
         if(gameState == 5){
-            jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cs/pkg245/twoLegs.png")));
-            gameOverLabel.setVisible(true);
-            wordLabel.setText(wordLabel.getText() + temp);
-            wordLabel.setVisible(true);
+            gameOver();
             
         }
         gameState++;
@@ -1078,7 +1075,30 @@ public class PlayFrame  extends javax.swing.JFrame  implements MouseListener{
         jButton2.setEnabled(false);
         incrementAttempts();
     }//GEN-LAST:event_clickA
-
+private void gameOver(){
+    jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cs/pkg245/twoLegs.png")));
+    gameOverLabel.setVisible(true);
+    wordLabel.setText(wordLabel.getText() + temp);
+    wordLabel.setVisible(true);
+    ActionListener  nextScreen = new ActionListener(){
+            boolean hasDisposed = false;
+            public void actionPerformed(ActionEvent actionEvent){           
+                if(!hasDisposed){
+                    //f.dispose();
+                    EndFrame endFrame = new EndFrame(points);
+                    endFrame.setLocationRelativeTo(null);
+                    endFrame.setBackground(Color.white);
+                    endFrame.setVisible(true);
+                    hasDisposed = true;
+                    PlayFrame f = tempFrame;
+                    f.dispose();
+                }
+            }
+        };
+        Timer t = new Timer(1000, nextScreen);
+        t.setInitialDelay(3000);
+        t.start();
+}
     private void skipButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_skipButtonActionPerformed
         // TODO add your handling code here:
         //go to end frame...we still need to display scores and etc
