@@ -18,21 +18,33 @@ import java.awt.event.ActionListener;
 import java.util.Date;
 import javax.swing.Timer;
 import java.util.Random;
+import javax.swing.JButton;
+import java.awt.Robot;
+import java.awt.event.InputEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import jdk.nashorn.internal.codegen.CompilerConstants;
 /**
  *
  * @author Luis
  */
-public class PlayFrame extends javax.swing.JFrame {
+public class PlayFrame  extends javax.swing.JFrame  implements MouseListener{
+    
+    
     private String[] dictionary = {"abstract", "cemetery", "nurse", "pharmacy", "climbing"};
     private String word, temp;
     private int points, attempts, gameState, max;
     private final int MAX_LETTERS = 9;
     private boolean controlDecrease, gameOver;
+    private Timer t;
+    private PlayFrame tempFrame;
     /**
      * Creates new form PlayFrame
      */
     public PlayFrame() {
+        tempFrame = this;
         getContentPane().setBackground(Color.white);
         points = 100;
         gameState = 0;
@@ -46,12 +58,15 @@ public class PlayFrame extends javax.swing.JFrame {
                 date = d.toString();                                        //STORE IN STRING.. IDK WHY LOL
                 jLabel1.setText(date);
                 checkWord();
+                if(gameState > 6 && points < 0)
+                    points = 0;
             }
         };
-        Timer t = new Timer(1000, updateDate);
+        t = new Timer(1000, updateDate);
         t.start();
         initComponents();
-        jLabel13.setVisible(false);
+        gameOverLabel.setVisible(false);
+        wordLabel.setVisible(false);
         jLabel9.setVisible(false);
         generateWord();
         setPoints();
@@ -72,7 +87,10 @@ public class PlayFrame extends javax.swing.JFrame {
             jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cs/pkg245/oneleg.png")));
         if(gameState == 5){
             jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cs/pkg245/twoLegs.png")));
-            jLabel13.setVisible(true);
+            gameOverLabel.setVisible(true);
+            wordLabel.setText(wordLabel.getText() + temp);
+            wordLabel.setVisible(true);
+            
         }
         gameState++;
     }
@@ -513,8 +531,8 @@ public class PlayFrame extends javax.swing.JFrame {
     public void generateWord(){
         Random r = new Random();
         int num = r.nextInt(5);
-        this.word = dictionary[num];
-         max = word.length();
+        temp = this.word = dictionary[num];
+        max = word.length();
         System.out.println("in generateWord method the number is " + num + " the word is " + word);
         //return dictionary[r.nextInt(5)];
         for (int i = 0 ; i < MAX_LETTERS;i++ )
@@ -563,7 +581,7 @@ public class PlayFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         jTextField1 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        skipButton = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
@@ -602,21 +620,23 @@ public class PlayFrame extends javax.swing.JFrame {
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
+        gameOverLabel = new javax.swing.JLabel();
+        wordLabel = new javax.swing.JLabel();
+        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 32767));
 
         jTextField1.setText("jTextField1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jButton1.setText("Skip");
-        jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
+        skipButton.setText("Skip");
+        skipButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 skip(evt);
             }
         });
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        skipButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                skipButtonActionPerformed(evt);
             }
         });
 
@@ -835,7 +855,9 @@ public class PlayFrame extends javax.swing.JFrame {
 
         jLabel12.setText("Score: 100");
 
-        jLabel13.setText("GAME OVER!");
+        gameOverLabel.setText("GAME OVER!");
+
+        wordLabel.setText("Word: ");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -924,22 +946,30 @@ public class PlayFrame extends javax.swing.JFrame {
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(jButton8))))
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(19, 19, 19)
-                                .addComponent(jLabel13)
+                                .addComponent(wordLabel)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(jLabel2)
-                                .addGap(19, 19, 19)))
-                        .addComponent(jButton9)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGap(19, 19, 19))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addComponent(gameOverLabel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton10)
-                            .addComponent(jLabel12))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jButton9)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jButton10)
+                                    .addComponent(jLabel12))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(43, 43, 43))))))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jButton1)
+                        .addComponent(skipButton)
                         .addContainerGap())
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jLabel1)
@@ -957,14 +987,18 @@ public class PlayFrame extends javax.swing.JFrame {
                     .addComponent(jLabel2)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(24, 24, 24)
-                        .addComponent(jLabel13)))
+                        .addComponent(gameOverLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(wordLabel)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(137, Short.MAX_VALUE))
+                        .addComponent(skipButton, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGap(0, 5, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -1019,10 +1053,7 @@ public class PlayFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void skip(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_skip
-        this.dispose();
-        StartFrame p = new StartFrame();
-        p.setLocationRelativeTo(null);
-        p.setVisible(true);
+        
     }//GEN-LAST:event_skip
 
     private void clickA(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_clickA
@@ -1048,15 +1079,37 @@ public class PlayFrame extends javax.swing.JFrame {
         incrementAttempts();
     }//GEN-LAST:event_clickA
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void skipButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_skipButtonActionPerformed
         // TODO add your handling code here:
         //go to end frame...we still need to display scores and etc
-        this.dispose();
+        points = 0;
+        gameOverLabel.setVisible(true);
+        wordLabel.setText(wordLabel.getText() + temp);
+        wordLabel.setVisible(true);
+        ActionListener  nextScreen = new ActionListener(){
+            boolean hasDisposed = false;
+            public void actionPerformed(ActionEvent actionEvent){           
+                if(!hasDisposed){
+                    //f.dispose();
+                    EndFrame endFrame = new EndFrame(points);
+                    endFrame.setLocationRelativeTo(null);
+                    endFrame.setBackground(Color.white);
+                    endFrame.setVisible(true);
+                    hasDisposed = true;
+                    PlayFrame f = tempFrame;
+                    f.dispose();
+                }
+            }
+        };
+        Timer t = new Timer(1000, nextScreen);
+        t.setInitialDelay(3000);
+        t.start();
+        /*this.dispose();
         EndFrame endFrame = new EndFrame(points);
         endFrame.setLocationRelativeTo(null);
         endFrame.setBackground(Color.white);
-        endFrame.setVisible(true);
-    }//GEN-LAST:event_jButton1ActionPerformed
+        endFrame.setVisible(true);*/
+    }//GEN-LAST:event_skipButtonActionPerformed
 
     private void clickB(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_clickB
         // TODO add your handling code here:
@@ -1625,7 +1678,8 @@ public class PlayFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.Box.Filler filler1;
+    private javax.swing.JLabel gameOverLabel;
     private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton11;
     private javax.swing.JButton jButton12;
@@ -1656,7 +1710,6 @@ public class PlayFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -1666,5 +1719,33 @@ public class PlayFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JTextField jTextField1;
+    private javax.swing.JButton skipButton;
+    private javax.swing.JLabel wordLabel;
     // End of variables declaration//GEN-END:variables
+
+    public void MouseClicked(MouseEvent e){
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        checkWord();
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        checkWord();
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        checkWord();
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+    }
 }
