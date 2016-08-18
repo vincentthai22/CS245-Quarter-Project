@@ -1,23 +1,55 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/***************************************************************
+* file: HighScores.java
+* author: Vincent Thai && Luis Lopez
+* class: CS 245 – Programming Graphical User Interfaces
+*
+* assignment: program 1
+* date last modified: 8/17/2016
+*
+* purpose: HighScores frame calls the FileWriter.java class and reads and displays
+*          highscores from a text file.
+*
+****************************************************************/
 package cs.pkg245;
 
 import java.awt.Color;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Luis
  */
 public class HighScores extends javax.swing.JFrame {
-
+    ArrayList<String> list = new ArrayList<>(5);
+    
+    FileWriter f;
     /**
      * Creates new form HighScores
+     * and updates text from .txt file.
      */
-    public HighScores() {
+    public HighScores() throws IOException {
         initComponents();
+        f = new FileWriter("highscores.txt", false);
+        list = f.list;
+        for(int i = 0 ; i < list.size(); i++){
+            //System.out.println("iter");
+            if( i == 0)
+                firstScore.setText(list.get(i));
+            if( i == 1)
+                secondScore.setText(list.get(i));
+            if( i == 2)
+                thirdScore.setText(list.get(i));
+            if( i == 3)
+                fourthScore.setText(list.get(i));
+            if( i == 4)
+                fifthScore.setText(list.get(i));
+        }
+    }
+    public HighScores(boolean isLoading) throws IOException{
+        f = new FileWriter("highscores.txt", false);
     }
 
     /**
@@ -31,11 +63,11 @@ public class HighScores extends javax.swing.JFrame {
 
         jLabel1 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
+        firstScore = new javax.swing.JLabel();
+        secondScore = new javax.swing.JLabel();
+        thirdScore = new javax.swing.JLabel();
+        fourthScore = new javax.swing.JLabel();
+        fifthScore = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(600, 400));
@@ -50,20 +82,20 @@ public class HighScores extends javax.swing.JFrame {
             }
         });
 
-        jLabel2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel2.setText("ABC....0000");
+        firstScore.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        firstScore.setText("ABC....0001");
 
-        jLabel3.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel3.setText("DEF....0000");
+        secondScore.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        secondScore.setText("DEF....0002");
 
-        jLabel4.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel4.setText("GHI....0000");
+        thirdScore.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        thirdScore.setText("GHI....0003");
 
-        jLabel5.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel5.setText("JKL....0000");
+        fourthScore.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        fourthScore.setText("JKL....0000");
 
-        jLabel6.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel6.setText("MNO....0000");
+        fifthScore.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        fifthScore.setText("MNO....0000");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -77,11 +109,11 @@ public class HighScores extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(117, 117, 117)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel4)
-                            .addComponent(jLabel5)
-                            .addComponent(jLabel6)))
+                            .addComponent(secondScore)
+                            .addComponent(firstScore)
+                            .addComponent(fourthScore)
+                            .addComponent(fifthScore)
+                            .addComponent(thirdScore)))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(107, 107, 107)
                         .addComponent(jLabel1)))
@@ -93,15 +125,15 @@ public class HighScores extends javax.swing.JFrame {
                 .addGap(28, 28, 28)
                 .addComponent(jLabel1)
                 .addGap(42, 42, 42)
-                .addComponent(jLabel2)
+                .addComponent(firstScore)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel3)
+                .addComponent(secondScore)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel4)
+                .addComponent(thirdScore)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel5)
+                .addComponent(fourthScore)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(fifthScore, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 155, Short.MAX_VALUE)
                 .addComponent(jButton1)
                 .addContainerGap())
@@ -148,18 +180,24 @@ public class HighScores extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new HighScores().setVisible(true);
+                try {
+                    new HighScores().setVisible(true);
+                } catch (IOException ex) {
+                    Logger.getLogger(HighScores.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
-
+    public ArrayList getScores(){
+        return list;
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel fifthScore;
+    private javax.swing.JLabel firstScore;
+    private javax.swing.JLabel fourthScore;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel secondScore;
+    private javax.swing.JLabel thirdScore;
     // End of variables declaration//GEN-END:variables
 }

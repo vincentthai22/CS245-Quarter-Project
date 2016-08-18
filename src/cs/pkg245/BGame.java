@@ -1,3 +1,18 @@
+/**
+ * *************************************************************
+ * file: BGame.java
+ * author: Vincent Thai && Luis Lopez
+ * class: CS 245 – Programming Graphical User Interfaces
+ *
+ * assignment: program 1
+ * date last modified: 8/17/2016
+ *
+ * purpose: Bubble Game Frame. Executes the bubble game and draws each bubble
+ *          and label for this portion of the game. Also handles the mechanics of
+ *           the game including score-tracking and click events.
+ *
+ ***************************************************************
+ */
 /*
  * Vincent Thai 
  * 
@@ -13,8 +28,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Ellipse2D;
+import java.io.IOException;
 import java.util.Date;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -26,10 +44,10 @@ import javax.swing.Timer;
  *
  * @author Vincent
  */
-public class BGame extends javax.swing.JFrame implements MouseListener{
-    
-    private String words[] = { "RED", "YELLOW", "GREEN", "BLUE", "PURPLE" };
-    private Color colors[] = { Color.red, Color.yellow, Color.green, Color.blue, Color.magenta };
+public class BGame extends javax.swing.JFrame {
+
+    private String words[] = {"RED", "YELLOW", "GREEN", "BLUE", "PURPLE"};
+    private Color colors[] = {Color.red, Color.yellow, Color.green, Color.blue, Color.magenta};
     JLabel[] arrCircles;
     BubbleGen bubble;
     JLabel jb;
@@ -38,123 +56,197 @@ public class BGame extends javax.swing.JFrame implements MouseListener{
     MyMouseListener m;// = new MyMouseListener();
     Random r = new Random();
     private final int WIDTH = 500, HEIGHT = 300, MAX_ROUNDS = 5;
-    private int counter;
+    private int counter, points;
     BGame b = this;
+
     /**
      * Creates new form BGame
      */
-    public BGame() {
+    /**
+     * @author Vincent method : Constructor takes in points purpose: Carries
+     * over points from hangman. initializes all variables.
+     */
+    public BGame(int points) {
+        this.points = points;
         initComponents();
+        gameOverLabel.setVisible(false);
+        pointsLabel.setText(pointsLabel.getText() + points + "");
         arrCircles = new JLabel[5];
         this.setLocationRelativeTo(null);
         counter = 0;
         m = new MyMouseListener();
-        ActionListener al = new ActionListener(){
+        setTimer();
+        createCircles();
+    }
+
+    /**
+     * @author Vincent method : default constructor purpose: debugging and
+     * testing.
+     */
+    public BGame() {
+        initComponents();
+        gameOverLabel.setVisible(false);
+        arrCircles = new JLabel[5];
+        this.setLocationRelativeTo(null);
+        counter = 0;
+        m = new MyMouseListener();
+        setTimer();
+        createCircles();
+
+    }
+
+    /**
+     * @author Vincent method : setTimer purpose: initializes timer
+     */
+    public void setTimer() {
+        ActionListener al = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Date d = new Date();
-                dateLabel.setText(d.toString());   
+                dateLabel.setText(d.toString());
             }
         };
         Timer t = new Timer(1000, al);
         t.start();
-        
-       // jb.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cs/pkg245/redCircle.png")));
-        //jb.setIcon();
-        /*new MouseAdapter(){
-            public void mouseEntered(MouseEvent e){
-                System.out.println("hello");
-                bubble.setColor(Color.yellow);
-                jb.setIcon(bubble);
-                jb.setBorder(BorderFactory.createLineBorder(Color.yellow));
-            }
-            public void mouseClicked(MouseEvent e){
-                System.out.println("hllo");
-                JLabel jb = new JLabel();
-                jb.setBounds(bubble.getX(), bubble.getY(), bubble.getIconWidth()+25, bubble.getIconHeight()+25);
-                new JFrame("frame");
-                jb.setIcon(bubble);
-            }
-        }*/
-        //jb.setBorder(compoundBorder1);
-        createCircles();
-        
     }
-    
-    public void createCircles(){
+
+    /**
+     * @author Vincent method : createCircles purpose: generates a set of 5
+     * circles.
+     */
+    public void createCircles() {
         word = words[r.nextInt(5)];
         color = colors[r.nextInt(5)];
         colorLabel.setForeground(color);
         colorLabel.setText(word);
-        for(int i = 0 ; i < arrCircles.length; i++){
+        for (int i = 0; i < arrCircles.length; i++) {
             bubble = new BubbleGen(WIDTH, HEIGHT, colors[i]);
-            System.out.println("Max : " + i);
-            while(checkBounds(bubble,i) != true){
-                bubble = new BubbleGen(WIDTH,HEIGHT,colors[i]);
+            //System.out.println("Max : " + i);
+            while (checkBounds(bubble, i) != true) {
+                bubble = new BubbleGen(WIDTH, HEIGHT, colors[i]);
             }
-            
+
             jb = new JLabel();
-            System.out.println(bubble.getX());
+            //System.out.println(bubble.getX());
             jb.setBounds(bubble.getX(), bubble.getY(), bubble.getIconWidth(), bubble.getIconHeight());
             jb.setIcon(bubble);
             arrCircles[i] = jb;
-            System.out.println(i + " :" + arrCircles[i].getBounds().toString());
+            //System.out.println(i + " :" + arrCircles[i].getBounds().toString());
             this.add(arrCircles[i]);
             arrCircles[i].addMouseListener(m);
-           
+
         }
-//        if(counter > 0)
-//            relocate();
     }
-    public void relocate(){
+
+    /**
+     * @author Vincent method : relocate purpose: relocates all bubbles on
+     * screen after each round.
+     */
+    public void relocate() {
+        if (counter >= 5) {
+            gameOver();
+        }
         word = words[r.nextInt(5)];
         color = colors[r.nextInt(5)];
         colorLabel.setForeground(color);
         colorLabel.setText(word);
-        for(int i = 0 ; i < arrCircles.length;i++){
+        for (int i = 0; i < arrCircles.length; i++) {
             bubble = new BubbleGen(WIDTH, HEIGHT, colors[i]);
-            System.out.println("Max : " + i);
-            while(checkBounds(bubble,i) != true){
-                bubble = new BubbleGen(WIDTH,HEIGHT,colors[i]);
+            //System.out.println("Max : " + i);
+            while (checkBounds(bubble, i) != true) {
+                bubble = new BubbleGen(WIDTH, HEIGHT, colors[i]);
             }
             arrCircles[i].setBounds(bubble.getX(), bubble.getY(), bubble.getIconWidth(), bubble.getIconHeight());
-            
+
         }
-        for(int i = 0; i < arrCircles.length; i++){
+        for (int i = 0; i < arrCircles.length; i++) {
             arrCircles[i].setLocation(arrCircles[i].getX(), arrCircles[i].getY());
         }
     }
-    public boolean checkBounds(BubbleGen b,int max){
-        //boolean isValid = true;
-        System.out.println("Test bubble:" + b.getBound().toString());
-        for(int i = 0; i < max; i++){
-            if(b.getX() > arrCircles[i].getX() && b.getX()<arrCircles[i].getX() + 100){
-                if(b.getY() > arrCircles[i].getY() && b.getY()<arrCircles[i].getY() + 100)
-                    return false;
-                if(b.getY() < arrCircles[i].getY() && b.getY() > arrCircles[i].getY() - 100)
-                    return false;
+
+    /**
+     * @author Vincent method : gameOver purpose: destructs game and calls the
+     * endGame frame.
+     */
+    public void gameOver() {
+
+        BGame f = this;
+        gameOverLabel.setVisible(true);
+        ActionListener nextScreen = new ActionListener() {
+            boolean hasDisposed = false;
+
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (!hasDisposed) {
+                    EndFrame endFrame = null;
+                    try {
+                        endFrame = new EndFrame(points);
+                    } catch (IOException ex) {
+                        Logger.getLogger(BGame.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    endFrame.setLocationRelativeTo(null);
+                    endFrame.setBackground(Color.white);
+                    endFrame.setVisible(true);
+                    hasDisposed = true;
+                    f.dispose();
+                }
             }
-            if(b.getY() > arrCircles[i].getY() && b.getY()<arrCircles[i].getY() + 100)
-                if(b.getX() > arrCircles[i].getX() && b.getX()<arrCircles[i].getX() + 100)
+        };
+        Timer t = new Timer(1000, nextScreen);
+        t.setInitialDelay(1500);
+        t.start();
+    }
+
+    /**
+     * @author Vincent method :checkBounds purpose: Bounds checking for spawning
+     * bubbles.
+     */
+    public boolean checkBounds(BubbleGen b, int max) {
+        //boolean isValid = true;
+        //System.out.println("Test bubble:" + b.getBound().toString());
+        for (int i = 0; i < max; i++) {
+            if (b.getX() >= arrCircles[i].getX() && b.getX() <= arrCircles[i].getX() + 100) {
+                if (b.getY() >= arrCircles[i].getY() && b.getY() <= arrCircles[i].getY() + 100) {
                     return false;
-            if(arrCircles[i].getX() > b.getX() && arrCircles[i].getX() < b.getX() + 100)
-                if(arrCircles[i].getY() > b.getY() && arrCircles[i].getY() < b.getY() + 100)
+                }
+                if (b.getY() <= arrCircles[i].getY() && b.getY() >= arrCircles[i].getY() - 100) {
                     return false;
-            if(arrCircles[i].getY() > b.getY() && arrCircles[i].getY() < b.getY() + 100)
-                if(arrCircles[i].getX() > b.getX() && arrCircles[i].getX() < b.getX() + 100)
+                }
+            }
+            if (b.getY() > arrCircles[i].getY() && b.getY() < arrCircles[i].getY() + 100) {
+                if (b.getX() > arrCircles[i].getX() && b.getX() < arrCircles[i].getX() + 100) {
                     return false;
-            if(b.getY() < arrCircles[i].getY() && b.getY() > arrCircles[i].getY() - 100)
-                    if(b.getX() < arrCircles[i].getX() && b.getX() > arrCircles[i].getX() - 100)
-                        return false;
-            if(b.getX() < arrCircles[i].getX() && b.getX() > arrCircles[i].getX() - 100){
-                if(b.getY() < arrCircles[i].getY() && b.getY() > arrCircles[i].getY() - 100)
+                }
+            }
+            if (arrCircles[i].getX() > b.getX() && arrCircles[i].getX() < b.getX() + 100) {
+                if (arrCircles[i].getY() > b.getY() && arrCircles[i].getY() < b.getY() + 100) {
                     return false;
-                if(b.getY() > arrCircles[i].getY() && b.getY() < arrCircles[i].getY() + 100)
+                }
+            }
+            if (arrCircles[i].getY() > b.getY() && arrCircles[i].getY() < b.getY() + 100) {
+                if (arrCircles[i].getX() > b.getX() && arrCircles[i].getX() < b.getX() + 100) {
                     return false;
+                }
+            }
+            if (b.getY() < arrCircles[i].getY() && b.getY() > arrCircles[i].getY() - 100) {
+                if (b.getX() < arrCircles[i].getX() && b.getX() > arrCircles[i].getX() - 100) {
+                    return false;
+                }
+            }
+            if (b.getX() <= arrCircles[i].getX() && b.getX() >= arrCircles[i].getX() - 100) {
+                if (b.getY() <= arrCircles[i].getY() && b.getY() >= arrCircles[i].getY() - 100) {
+                    return false;
+                }
+                if (b.getY() >= arrCircles[i].getY() && b.getY() <= arrCircles[i].getY() + 100) {
+                    return false;
+                }
+            }
+            if (b.getBound().intersects(colorLabel.getBounds())) {
+                return false;
             }
         }
         return true;
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -169,6 +261,9 @@ public class BGame extends javax.swing.JFrame implements MouseListener{
         compoundBorder1 = javax.swing.BorderFactory.createCompoundBorder();
         colorLabel = new javax.swing.JLabel();
         dateLabel = new javax.swing.JLabel();
+        pointsLabel = new javax.swing.JLabel();
+        gameOverLabel = new javax.swing.JLabel();
+        roundLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -177,27 +272,51 @@ public class BGame extends javax.swing.JFrame implements MouseListener{
 
         dateLabel.setText(" ");
 
+        pointsLabel.setText("POINTS: ");
+
+        gameOverLabel.setFont(new java.awt.Font("Dialog", 1, 36)); // NOI18N
+        gameOverLabel.setText("GAME OVER!");
+
+        roundLabel.setText("Round: 0");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(16, 16, 16)
+                .addComponent(pointsLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(dateLabel)
                 .addGap(63, 63, 63))
             .addGroup(layout.createSequentialGroup()
-                .addGap(211, 211, 211)
-                .addComponent(colorLabel)
-                .addContainerGap(267, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(211, 211, 211)
+                        .addComponent(colorLabel))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(166, 166, 166)
+                        .addComponent(gameOverLabel)))
+                .addContainerGap(205, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(roundLabel)
+                .addGap(87, 87, 87))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(dateLabel)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(dateLabel)
+                    .addComponent(pointsLabel))
                 .addGap(36, 36, 36)
                 .addComponent(colorLabel)
-                .addContainerGap(310, Short.MAX_VALUE))
+                .addGap(65, 65, 65)
+                .addComponent(gameOverLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 176, Short.MAX_VALUE)
+                .addComponent(roundLabel)
+                .addContainerGap())
         );
 
         pack();
@@ -242,61 +361,61 @@ public class BGame extends javax.swing.JFrame implements MouseListener{
     private javax.swing.JLabel colorLabel;
     private javax.swing.border.CompoundBorder compoundBorder1;
     private javax.swing.JLabel dateLabel;
+    private javax.swing.JLabel gameOverLabel;
     private javax.swing.border.MatteBorder matteBorder1;
+    private javax.swing.JLabel pointsLabel;
+    private javax.swing.JLabel roundLabel;
     private javax.swing.border.SoftBevelBorder softBevelBorder1;
     // End of variables declaration//GEN-END:variables
 
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+//------------------------------------OVERLOADED MOUSE LISTENER CLASS HANDLES ALL MOUSE ACTIONS---------------------------
+    class MyMouseListener extends MouseAdapter {
 
-    @Override
-    public void mousePressed(MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-        JLabel l =(JLabel) e.getSource();
-        if(l.getName().equals(jb.getName()))
-            System.out.println("in");
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    class MyMouseListener extends MouseAdapter{
-       /* JLabel[] labels;
+        /* JLabel[] labels;
         Color color;
         MyMouseListener(JLabel[] labels, Color color){
             this.labels = labels;
             this.color = color;
             
         }*/
-        public void mouseClicked(MouseEvent e){
-            JLabel l = (JLabel)e.getSource();
-            BubbleGen g = (BubbleGen)l.getIcon();
-            if(g.getColor().equals(color)){
-                counter++;
-                System.out.println("You Win!");
-               // createCircles();
-               relocate();
-                
+        public void mouseClicked(MouseEvent e) {
+            if (counter < 6) {
+                JLabel l = (JLabel) e.getSource();
+                BubbleGen g = (BubbleGen) l.getIcon();
+                if (g.getColor().equals(color)) {
+                    points += 100;
+                    pointsLabel.setText("Points: " + points + "");
+                    roundLabel.setText("Round: " + ++counter + "");
+                    System.out.println("You Win!");
+                    relocate();
+
+                } else {
+                    pointsLabel.setText("Points: " + points + "");
+                    roundLabel.setText("Round: " + ++counter + "");
+                    relocate();
+                }
             }
-          
         }
-        public void mouseEntered(MouseEvent e){
-            JLabel l = (JLabel)e.getSource();
-            for(JLabel labels : arrCircles){
-                if(l.equals(labels))
-                    System.out.println("yes");
+
+        public void mouseEntered(MouseEvent e) {
+            JLabel l = (JLabel) e.getSource();
+            for (JLabel labels : arrCircles) {
+                if (l.equals(labels)) {
+                    //System.out.println("yes");
+                    l.setBorder(softBevelBorder1);
+                }
+            }
+        }
+
+        public void mouseExited(MouseEvent e) {
+
+            JLabel l = (JLabel) e.getSource();
+            for (JLabel labels : arrCircles) {
+                if (l.equals(labels)) {
+                    //System.out.println("yes");
+                    l.setBorder(matteBorder1);
+                }
+
             }
         }
     }

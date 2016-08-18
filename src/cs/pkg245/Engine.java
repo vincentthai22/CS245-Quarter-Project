@@ -1,5 +1,5 @@
 /***************************************************************
-* file: StartFrame.java
+* file: Engine.java
 * author: Vincent Thai && Luis Lopez
 * class: CS 245 – Programming Graphical User Interfaces
 *

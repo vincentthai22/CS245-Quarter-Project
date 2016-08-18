@@ -1,10 +1,10 @@
 /***************************************************************
-* file: StartFrame.java
+* file: EndFrame.java
 * author: Vincent Thai && Luis Lopez
 * class: CS 245 – Programming Graphical User Interfaces
 *
 * assignment: program 1
-* date last modified: 8/10/2016
+* date last modified: 8/17/2016
 *
 * purpose: EndFrame terminates current session and displays score.
 *
@@ -12,6 +12,9 @@
 package cs.pkg245;
 
 import java.awt.Color;
+import java.io.File;
+import java.io.IOException;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -22,18 +25,33 @@ public class EndFrame extends javax.swing.JFrame {
     /**
      * Creates new form EndFrame
      */
-    public EndFrame() {
+     FileWriter f;
+    public EndFrame(){
         score = 100;
         getContentPane().setBackground(Color.white);
         initComponents();
         jLabel2.setText(jLabel2.getText() + score);
     }
-    public EndFrame(int p) {
+/**
+ * @author Vincent
+ * method : CONSTRUCTOR
+ * purpose: takes in points as arg and displays it.
+ */       
+    public EndFrame(int p) throws IOException {
+        if(p < 0)
+            p = 0;
         score = p;
         getContentPane().setBackground(Color.white);
         initComponents();
         jLabel2.setText(jLabel2.getText() + score);
+        f = new FileWriter("highscores.txt", true);
+        if (score > f.getLowest()){
+            String name = JOptionPane.showInputDialog(null, "Enter your name :", "NEW HIGH SCORE", JOptionPane.QUESTION_MESSAGE);
+            System.out.println(f.getLowest());
+            f.updateScores(score, name);
+        }
     }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -75,30 +93,34 @@ public class EndFrame extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(118, 118, 118)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(160, Short.MAX_VALUE))
+                .addGap(199, 199, 199)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(279, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(190, 190, 190)
+                        .addComponent(jLabel2)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jButton2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(63, 63, 63)
+                .addGap(57, 57, 57)
                 .addComponent(jLabel1)
-                .addGap(54, 54, 54)
+                .addGap(104, 104, 104)
                 .addComponent(jLabel2)
-                .addGap(18, 18, 18)
+                .addGap(67, 67, 67)
                 .addComponent(jButton1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton2)
-                .addContainerGap(26, Short.MAX_VALUE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         pack();
@@ -107,7 +129,7 @@ public class EndFrame extends javax.swing.JFrame {
     private void playAgain(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_playAgain
         // TODO add your handling code here:
         this.dispose();
-        PlayFrame p = new PlayFrame();
+        BGame p = new BGame();
         p.setLocationRelativeTo(null);
         p.setBackground(Color.white);
         p.setVisible(true);
