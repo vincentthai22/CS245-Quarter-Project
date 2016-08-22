@@ -23,7 +23,9 @@ import java.util.logging.Logger;
  * @author Luis
  */
 public class HighScores extends javax.swing.JFrame {
-    ArrayList<String> list = new ArrayList<>(5);
+    private final int MAX_SCORES = 5;
+    ArrayList<String> list = new ArrayList<>(MAX_SCORES);
+    ArrayList<String> defaultList = new ArrayList<>(MAX_SCORES);
     
     FileWriter f;
     /**
@@ -32,6 +34,11 @@ public class HighScores extends javax.swing.JFrame {
      */
     public HighScores() throws IOException {
         initComponents();
+        defaultList.add(firstScore.getText());
+        defaultList.add(secondScore.getText());
+        defaultList.add(thirdScore.getText());
+        defaultList.add(fourthScore.getText());
+        defaultList.add(fifthScore.getText());
         f = new FileWriter("highscores.txt", false);
         list = f.list;
         for(int i = 0 ; i < list.size(); i++){
@@ -68,6 +75,7 @@ public class HighScores extends javax.swing.JFrame {
         thirdScore = new javax.swing.JLabel();
         fourthScore = new javax.swing.JLabel();
         fifthScore = new javax.swing.JLabel();
+        resetButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(600, 400));
@@ -97,15 +105,19 @@ public class HighScores extends javax.swing.JFrame {
         fifthScore.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         fifthScore.setText("MNO....0000");
 
+        resetButton.setText("Reset");
+        resetButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                resetButtonMouseClicked(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jButton1))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(117, 117, 117)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -118,6 +130,12 @@ public class HighScores extends javax.swing.JFrame {
                         .addGap(107, 107, 107)
                         .addComponent(jLabel1)))
                 .addContainerGap(184, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(resetButton)
+                .addGap(15, 15, 15))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -135,7 +153,9 @@ public class HighScores extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(fifthScore, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 155, Short.MAX_VALUE)
-                .addComponent(jButton1)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton1)
+                    .addComponent(resetButton))
                 .addContainerGap())
         );
 
@@ -149,6 +169,22 @@ public class HighScores extends javax.swing.JFrame {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }//GEN-LAST:event_goBack
+
+    private void resetButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_resetButtonMouseClicked
+        try {
+            f = new FileWriter("highscores.txt", defaultList);
+        } catch (IOException ex) {
+            Logger.getLogger(HighScores.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        this.dispose();
+        try {
+            HighScores h = new HighScores();
+            h.setLocationRelativeTo(null);
+            h.setVisible(true);
+        } catch (IOException ex) {
+            Logger.getLogger(HighScores.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_resetButtonMouseClicked
 
     /**
      * @param args the command line arguments
@@ -197,6 +233,7 @@ public class HighScores extends javax.swing.JFrame {
     private javax.swing.JLabel fourthScore;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton resetButton;
     private javax.swing.JLabel secondScore;
     private javax.swing.JLabel thirdScore;
     // End of variables declaration//GEN-END:variables

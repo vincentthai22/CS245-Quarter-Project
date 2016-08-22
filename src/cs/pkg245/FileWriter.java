@@ -36,6 +36,7 @@ public class FileWriter {
     String[] scores;
     int index;
     boolean isModify;
+    String fileName;
     ArrayList<String> list = new ArrayList<String>(5);
 
     public static void main(String[] args) throws IOException {
@@ -45,6 +46,7 @@ public class FileWriter {
 
     public FileWriter(String fileName, boolean isModify) throws FileNotFoundException, IOException {
         index = 0;
+        this.fileName = fileName;
         this.isModify = isModify;
         inputFile = new Scanner(new File(fileName));
         names = new String[5];
@@ -52,7 +54,12 @@ public class FileWriter {
         readScores();
         inputFile.close();
     }
-
+    public FileWriter(String fileName, ArrayList<String> list) throws FileNotFoundException, IOException{
+        FileClearer f = new FileClearer(fileName);
+        oStream = new PrintWriter(fileName);
+        for(Object l : list)
+            writeScores(l.toString());
+    }
     /**
      * @author Vincent method : updateScores purpose: reads scores from .txt
      * file, stores the newest scores at the index of the lowest item in the
@@ -60,8 +67,8 @@ public class FileWriter {
      * and re-adds it to the .txt file.
      */
     public void updateScores(int num, String name) throws IOException {
-        FileClearer f = new FileClearer();
-        oStream = new PrintWriter("highscores.txt");
+        FileClearer f = new FileClearer(fileName);
+        oStream = new PrintWriter(fileName);
         scores[4] = num + "";
         names[4] = name;
         System.out.println(scores[0] + "...." + names[0]);
@@ -179,9 +186,9 @@ public class FileWriter {
 
 class FileClearer {
 
-    FileClearer() throws FileNotFoundException {
+    FileClearer(String fileName) throws FileNotFoundException {
 
-        PrintWriter oStream = new PrintWriter("highscores.txt");
+        PrintWriter oStream = new PrintWriter(fileName);
         oStream.close();
     }
 }
